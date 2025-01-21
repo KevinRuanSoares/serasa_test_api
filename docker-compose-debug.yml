@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  app:
+    build: 
+      context: .
+      args:
+        - DEV=true
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    volumes:
+      - ./app:/app
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python -m debugpy --wait-for-client --listen 0.0.0.0:5678 ./manage.py runserver 0.0.0.0:8000"
+    environment: 
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - EMAIL_USE_TLS=${APP_EMAIL_USE_TLS}
+      - EMAIL_HOST=${APP_EMAIL_HOST}
+      - EMAIL_PORT=${APP_EMAIL_PORT}
+      - EMAIL_HOST_USER=${APP_EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${APP_EMAIL_HOST_PASSWORD}
+      - DEFAULT_FROM_EMAIL=${APP_DEFAULT_FROM_EMAIL}
+      - DEFAULT_TO_EMAIL=${APP_DEFAULT_TO_EMAIL}
+      - EMAIL_DEFAULT=${APP_EMAIL_DEFAULT}
+      - AWS_ACCESS_KEY_ID=${APP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${APP_AWS_SECRET_ACCESS_KEY}
+      - AWS_STORAGE_BUCKET_NAME=${APP_AWS_STORAGE_BUCKET_NAME}
+      - AWS_S3_REGION_NAME=${APP_AWS_S3_REGION_NAME}
+      - AWS_CLOUDFRONT_CUSTOM_DOMAIN=${APP_AWS_CLOUDFRONT_CUSTOM_DOMAIN}
+      - DEBUG=1
