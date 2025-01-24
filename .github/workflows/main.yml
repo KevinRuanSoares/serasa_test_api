@@ -81,7 +81,7 @@ jobs:
     - name: Deploy to EC2
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST_PRD }} << 'EOF'
-          cd /home/ubuntu/sales_growth_ai_api
+          cd /home/ubuntu/serasa_test_api
           	git pull origin
             docker-compose -f docker-compose-deploy.yml build app
             docker-compose -f docker-compose-deploy.yml up --no-deps -d app
