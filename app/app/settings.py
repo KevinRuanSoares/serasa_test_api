@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "core",
     "user",
+    "producer",
     "django_filters",
 ]
 
