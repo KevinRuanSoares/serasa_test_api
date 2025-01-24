@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
-from producer.models import Producer, Farm
+from producer.models import Producer, Farm, Crop, Harvest, PlantedCrop
 
 
 class ProducerSerializer(serializers.ModelSerializer):
@@ -48,3 +48,27 @@ class FarmSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         return super().update(instance, validated_data)
+
+
+class CropSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Crop
+        fields = ['id', 'name', 'created_at', 'updated_at']
+        read_only_fields = ('id', 'created_at', 'updated_at')
+
+
+class HarvestSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Harvest
+        fields = ['id', 'year', 'farm', 'created_at', 'updated_at']
+        read_only_fields = ('id', 'created_at', 'updated_at')
+
+
+class PlantedCropSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PlantedCrop
+        fields = ['id', 'harvest', 'crop', 'created_at', 'updated_at']
+        read_only_fields = ('id', 'created_at', 'updated_at')

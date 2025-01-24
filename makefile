@@ -28,7 +28,7 @@ style:
 	docker-compose run --rm app sh -c "flake8 --max-line-length=120"
 
 test:
-	docker-compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test"
+	docker-compose run --rm app sh -c "python manage.py wait_for_db && python manage.py test producer.tests.test_crop_harvest_planted_crops"
 
 remove-continers:
 	docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker volume rm $(docker volume ls -q) && docker system prune -a

@@ -3,9 +3,15 @@ from user.auth import (
     CheckTokenAuthentication,
 )
 from django_filters.rest_framework import DjangoFilterBackend
-from producer.serializers import ProducerSerializer, FarmSerializer
-from producer.models import Producer, Farm
-from producer.filters import ProducerFilter, FarmFilter
+from producer.serializers import (
+    ProducerSerializer,
+    FarmSerializer,
+    CropSerializer,
+    HarvestSerializer,
+    PlantedCropSerializer
+)
+from producer.models import Producer, Farm, Crop, Harvest, PlantedCrop
+from producer.filters import ProducerFilter, FarmFilter, CropFilter, HarvestFilter, PlantedCropFilter
 from user.permissions import IsSuperAdmin, IsAdmin
 from utils.pagination import CustomPagination
 
@@ -66,6 +72,84 @@ class FarmRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [CheckTokenAuthentication]
     permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
     queryset = Farm.objects.exclude(is_deleted=True)
+    lookup_field = 'id'
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
+
+
+class CropManagementView(generics.ListCreateAPIView):
+    serializer_class = CropSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = CropFilter
+    ordering_fields = ['name', 'created_at', 'updated_at']
+    ordering = ['name']
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        return Crop.objects.exclude(is_deleted=True)
+
+
+class CropRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CropSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    queryset = Crop.objects.exclude(is_deleted=True)
+    lookup_field = 'id'
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
+
+
+class HarvestManagementView(generics.ListCreateAPIView):
+    serializer_class = HarvestSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = HarvestFilter
+    ordering_fields = ['year', 'farm', 'created_at', 'updated_at']
+    ordering = ['year']
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        return Harvest.objects.exclude(is_deleted=True)
+
+
+class HarvestRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = HarvestSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    queryset = Harvest.objects.exclude(is_deleted=True)
+    lookup_field = 'id'
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
+
+
+class PlantedCropManagementView(generics.ListCreateAPIView):
+    serializer_class = PlantedCropSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = PlantedCropFilter
+    ordering_fields = ['harvest', 'crop', 'created_at', 'updated_at']
+    ordering = ['harvest']
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        return PlantedCrop.objects.exclude(is_deleted=True)
+
+
+class PlantedCropRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PlantedCropSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    queryset = PlantedCrop.objects.exclude(is_deleted=True)
     lookup_field = 'id'
 
     def perform_destroy(self, instance):
