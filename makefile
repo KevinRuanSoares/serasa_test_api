@@ -34,10 +34,10 @@ remove-continers:
 	docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker volume rm $(docker volume ls -q) && docker system prune -a
 
 proxy-terminal:
-	docker exec -ti django_api_model_proxy_1 sh
+	docker exec -ti serasa_test_api_proxy_1 sh
 
 app-terminal:
-	docker exec -ti django_api_model-app-1 sh
+	docker exec -ti serasa_test_api-app-1 sh
 
 makemessages:
 	docker-compose run --rm app sh -c "django-admin makemessages -l pt_BR"
