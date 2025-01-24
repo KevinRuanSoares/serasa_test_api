@@ -8,15 +8,19 @@ from producer.models import Farm
 from producer.serializers import FarmSerializer
 from user.models import Role
 
+
 LIST_CREATE_FARM_URL = reverse('producer:list_create_farm')
+
 
 def detail_url(farm_id):
     """Return the URL for a specific farm."""
     return reverse('producer:update_retrieve_farm', kwargs={'id': farm_id})
 
+
 def create_user(**params):
     """Create and return a new user."""
     return get_user_model().objects.create_user(**params)
+
 
 class PublicFarmApiTests(TestCase):
     """Test the public access to the farm API."""
@@ -29,6 +33,7 @@ class PublicFarmApiTests(TestCase):
         res = self.client.get(LIST_CREATE_FARM_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class PrivateFarmApiTests(TestCase):
     """Test authenticated access to the farm API."""
@@ -53,8 +58,24 @@ class PrivateFarmApiTests(TestCase):
 
     def test_list_farms(self):
         """Test listing farms."""
-        Farm.objects.create(name='Farm 1', city='City 1', state='SP', total_area=100.0, arable_area=70.0, vegetation_area=30.0, producer=self.producer)
-        Farm.objects.create(name='Farm 2', city='City 2', state='MG', total_area=200.0, arable_area=150.0, vegetation_area=50.0, producer=self.producer)
+        Farm.objects.create(
+            name='Farm 1',
+            city='City 1',
+            state='SP',
+            total_area=100.0,
+            arable_area=70.0,
+            vegetation_area=30.0,
+            producer=self.producer
+        )
+        Farm.objects.create(
+            name='Farm 2',
+            city='City 2',
+            state='MG',
+            total_area=200.0,
+            arable_area=150.0,
+            vegetation_area=50.0,
+            producer=self.producer
+        )
 
         res = self.client.get(LIST_CREATE_FARM_URL)
 
@@ -86,7 +107,15 @@ class PrivateFarmApiTests(TestCase):
 
     def test_retrieve_farm(self):
         """Test retrieving a specific farm."""
-        farm = Farm.objects.create(name='Farm 1', city='City 1', state='SP', total_area=100.0, arable_area=70.0, vegetation_area=30.0, producer=self.producer)
+        farm = Farm.objects.create(
+            name='Farm 1',
+            city='City 1',
+            state='SP',
+            total_area=100.0,
+            arable_area=70.0,
+            vegetation_area=30.0,
+            producer=self.producer
+        )
 
         url = detail_url(farm.id)
         res = self.client.get(url)
@@ -98,7 +127,15 @@ class PrivateFarmApiTests(TestCase):
 
     def test_update_farm(self):
         """Test updating a farm."""
-        farm = Farm.objects.create(name='Farm 1', city='City 1', state='SP', total_area=100.0, arable_area=70.0, vegetation_area=30.0, producer=self.producer)
+        farm = Farm.objects.create(
+            name='Farm 1',
+            city='City 1',
+            state='SP',
+            total_area=100.0,
+            arable_area=70.0,
+            vegetation_area=30.0,
+            producer=self.producer
+        )
 
         payload = {'name': 'Updated Farm', 'city': 'Updated City'}
         url = detail_url(farm.id)
@@ -111,7 +148,15 @@ class PrivateFarmApiTests(TestCase):
 
     def test_delete_farm(self):
         """Test soft deleting a farm."""
-        farm = Farm.objects.create(name='Farm 1', city='City 1', state='SP', total_area=100.0, arable_area=70.0, vegetation_area=30.0, producer=self.producer)
+        farm = Farm.objects.create(
+            name='Farm 1',
+            city='City 1',
+            state='SP',
+            total_area=100.0,
+            arable_area=70.0,
+            vegetation_area=30.0,
+            producer=self.producer
+        )
 
         url = detail_url(farm.id)
         res = self.client.delete(url)
@@ -122,8 +167,24 @@ class PrivateFarmApiTests(TestCase):
 
     def test_list_farms_with_filter(self):
         """Test filtering farms by name."""
-        Farm.objects.create(name='Farm 1', city='City 1', state='SP', total_area=100.0, arable_area=70.0, vegetation_area=30.0, producer=self.producer)
-        Farm.objects.create(name='Farm 2', city='City 2', state='MG', total_area=200.0, arable_area=150.0, vegetation_area=50.0, producer=self.producer)
+        Farm.objects.create(
+            name='Farm 1',
+            city='City 1',
+            state='SP',
+            total_area=100.0,
+            arable_area=70.0,
+            vegetation_area=30.0,
+            producer=self.producer
+        )
+        Farm.objects.create(
+            name='Farm 2',
+            city='City 2',
+            state='MG',
+            total_area=200.0,
+            arable_area=150.0,
+            vegetation_area=50.0,
+            producer=self.producer
+        )
 
         res = self.client.get(LIST_CREATE_FARM_URL, {'name': 'Farm 1'})
 
@@ -133,8 +194,24 @@ class PrivateFarmApiTests(TestCase):
 
     def test_list_farms_with_ordering(self):
         """Test ordering farms by name."""
-        Farm.objects.create(name='Farm B', city='City 1', state='SP', total_area=100.0, arable_area=70.0, vegetation_area=30.0, producer=self.producer)
-        Farm.objects.create(name='Farm A', city='City 2', state='MG', total_area=200.0, arable_area=150.0, vegetation_area=50.0, producer=self.producer)
+        Farm.objects.create(
+            name='Farm B',
+            city='City 1',
+            state='SP',
+            total_area=100.0,
+            arable_area=70.0,
+            vegetation_area=30.0,
+            producer=self.producer
+        )
+        Farm.objects.create(
+            name='Farm A',
+            city='City 2',
+            state='MG',
+            total_area=200.0,
+            arable_area=150.0,
+            vegetation_area=50.0,
+            producer=self.producer
+        )
 
         res = self.client.get(LIST_CREATE_FARM_URL, {'ordering': 'name'})
 
