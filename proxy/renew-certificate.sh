@@ -1,7 +1,7 @@
 #!/bin/sh
 # Check if the certificate exists, and if not, obtain it
-# if [ ! -d "/etc/letsencrypt/live/brain_agriculture.kevinrsoares.com.br" ]; then
-#   certbot certonly --webroot -w /var/www/html/ -d brain_agriculture.kevinrsoares.com.br --email contato@kevinrsoares.com.br --agree-tos --non-interactive
+# if [ ! -d "/etc/letsencrypt/live/brain_agriculture.kevinsoares.com.br" ]; then
+#   certbot certonly --webroot -w /var/www/html/ -d brain_agriculture.kevinsoares.com.br --email contato@kevinrsoares.com.br --agree-tos --non-interactive
 
 # fi
 # Renew the certificate
