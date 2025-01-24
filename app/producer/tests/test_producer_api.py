@@ -7,7 +7,7 @@ from producer.models import Producer
 from user.models import Role
 from producer.serializers import ProducerSerializer
 
-LIST_CREATE_PRODUCER_URL = reverse('producer:list_create')
+LIST_CREATE_PRODUCER_URL = reverse('producer:list_create_producer')
 
 
 def create_user(**params):
@@ -17,7 +17,7 @@ def create_user(**params):
 
 def detail_url(producer_id):
     """Return the URL for a specific producer."""
-    return reverse('producer:update_retrieve', kwargs={'id': producer_id})
+    return reverse('producer:update_retrieve_producer', kwargs={'id': producer_id})
 
 
 class PublicProducerApiTests(TestCase):

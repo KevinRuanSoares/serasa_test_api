@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from producer.models import Producer
+from producer.models import Producer, Farm
 
 
 class ProducerFilter(filters.FilterSet):
@@ -9,3 +9,14 @@ class ProducerFilter(filters.FilterSet):
     class Meta:
         model = Producer
         fields = ['cpf_cnpj', 'name']
+
+
+class FarmFilter(filters.FilterSet):
+    name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    city = filters.CharFilter(field_name='city', lookup_expr='icontains')
+    state = filters.CharFilter(field_name='state', lookup_expr='iexact')
+    producer = filters.CharFilter(field_name='producer__id', lookup_expr='exact')
+
+    class Meta:
+        model = Farm
+        fields = ['name', 'city', 'state', 'producer']

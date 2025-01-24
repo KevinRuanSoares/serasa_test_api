@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-24 15:06+0000\n"
+"POT-Creation-Date: 2025-01-24 19:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: producer/serializers.py:30
+msgid ""
+"The sum of the arable and vegetation areas cannot exceed the total area of ​​"
+"the farm."
+msgstr "A soma das áreas agricultável e de vegetação não pode ultrapassar a área total da fazenda."
 
 #: user/auth/token.py:19 user/serializers.py:124
 msgid "Invalid token."
@@ -75,6 +81,22 @@ msgstr "O código não existe."
 #| msgid "Invalid token."
 msgid "Invalid code."
 msgstr "Código inválido."
+
+#: utils/document_validator.py:14
+#, fuzzy
+#| msgid "Invalid Code."
+msgid "Invalid CPF."
+msgstr "CPF inválido."
+
+#: utils/document_validator.py:17
+#, fuzzy
+#| msgid "Invalid Code."
+msgid "Invalid CNPJ."
+msgstr "CNPJ inválido."
+
+#: utils/document_validator.py:19
+msgid "The value provided is not a valid CPF or CNPJ."
+msgstr "O valor informado não é um CPF ou CNPJ válido."
 
 #: utils/email.py:15 utils/tests/test_email.py:30
 msgid "Your code to generate a new password!"

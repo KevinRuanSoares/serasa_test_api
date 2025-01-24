@@ -1,5 +1,6 @@
 import re
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 
 def validate_cpf_cnpj(value):
@@ -10,12 +11,12 @@ def validate_cpf_cnpj(value):
 
     if len(cpf_cnpj) == 11:
         if not validate_cpf(cpf_cnpj):
-            raise ValidationError("CPF inválido.")
+            raise ValidationError(_("Invalid CPF."))
     elif len(cpf_cnpj) == 14:
         if not validate_cnpj(cpf_cnpj):
-            raise ValidationError("CNPJ inválido.")
+            raise ValidationError(_("Invalid CNPJ."))
     else:
-        raise ValidationError("O valor informado não é um CPF ou CNPJ válido.")
+        raise ValidationError(_("The value provided is not a valid CPF or CNPJ."))
 
 
 def validate_cpf(cpf):
