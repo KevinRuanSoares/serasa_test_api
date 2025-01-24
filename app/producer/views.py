@@ -26,3 +26,19 @@ class ProducerManagementView(generics.ListCreateAPIView):
         return Producer.objects.exclude(
             is_deleted=True
         )
+
+class ProducerRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    """Manage retrieving and updating users in the system."""
+    serializer_class = ProducerSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    queryset = Producer.objects.exclude(is_deleted=True)
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
