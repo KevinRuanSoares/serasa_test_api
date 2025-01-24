@@ -27,6 +27,7 @@ class ProducerManagementView(generics.ListCreateAPIView):
             is_deleted=True
         )
 
+
 class ProducerRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     """Manage retrieving and updating users in the system."""
     serializer_class = ProducerSerializer
