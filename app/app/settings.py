@@ -47,7 +47,7 @@ EMAIL_DEFAULT = os.environ.get("EMAIL_DEFAULT", "")
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
 
-PROJECT_VERSION = "1.1.1"
+PROJECT_VERSION = "1.1.0"
 
 # Application definition
 

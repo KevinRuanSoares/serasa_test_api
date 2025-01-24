@@ -1,0 +1,90 @@
+name: Homologation Ci/Cd Pipeline
+
+on:
+  push:
+    branches:
+      - hom
+
+jobs: 
+  test-lint:
+    name: Test and Lint
+    runs-on: ubuntu-20.04
+    env:
+      DB_HOST: db
+      DB_NAME: dev_db
+      DB_USER: devuser
+      DB_PASS: id2j98dj123djw7d88
+      DJANGO_SECRET_KEY: django_secret_key
+      DJANGO_ALLOWED_HOSTS: 127.0.0.1
+      APP_EMAIL: contato@email.com.br
+      APP_DOMAIN: dominio.com.br
+      APP_EMAIL_USE_TLS: 1
+      APP_EMAIL_HOST: smtp.googlemail.com
+      APP_EMAIL_PORT: 587
+      APP_EMAIL_HOST_USER: contato@email.com.br
+      APP_EMAIL_HOST_PASSWORD: abc123
+      APP_DEFAULT_FROM_EMAIL: contato@email.com.br
+      APP_DEFAULT_TO_EMAIL: DjangoAPI
+      APP_EMAIL_DEFAULT: contato@email.com.br
+      APP_AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+      APP_AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
+      APP_AWS_STORAGE_BUCKET_NAME: django-static
+      APP_AWS_S3_REGION_NAME: us-east-1
+      APP_AWS_CLOUDFRONT_CUSTOM_DOMAIN: cloudfront.net
+      OPEN_AI_API_KEY: OPEN_AI_API_KEY
+      OPEN_AI_ASSISTANT_ID: OPEN_AI_ASSISTANT_ID
+      TWILIO_ACCOUNT_SID: TWILIO_ACCOUNT_SID
+      TWILIO_AUTH_TOKEN: TWILIO_AUTH_TOKEN
+      TWILIO_PHONE_NUMBER: TWILIO_PHONE_NUMBER
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+      
+      - name: Test
+        run: make test
+      
+      - name: Lint
+        run: make style
+
+  deploy:
+    name: Deploy
+    needs: test-lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH agent
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+    - name: Add GitHub.com to known hosts
+      run: ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+
+    - name: Add EC2 host to known hosts
+      run: ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd /home/ubuntu/sales_growth_ai_api
+          	git pull origin
+            docker-compose -f docker-compose-deploy.yml build app
+            docker-compose -f docker-compose-deploy.yml up --no-deps -d app
+            docker-compose -f docker-compose-deploy.yml build appws
+            docker-compose -f docker-compose-deploy.yml up --no-deps -d appws
+        EOF
