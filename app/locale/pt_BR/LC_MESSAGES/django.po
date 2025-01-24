@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-19 19:37+0000\n"
+"POT-Creation-Date: 2025-01-24 15:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,15 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: user/admin.py:18
-msgid "Permissions"
-msgstr "Permissões"
-
-#: user/admin.py:27
-msgid "Important dates"
-msgstr "Datas importantes"
-
-#: user/auth/token.py:19 user/serializers.py:90
+#: user/auth/token.py:19 user/serializers.py:124
 msgid "Invalid token."
 msgstr "Token inválido."
 
@@ -50,35 +42,35 @@ msgstr "Admin"
 msgid "Seller"
 msgstr "Vendedor"
 
-#: user/models.py:46
+#: user/models.py:59
 msgid "User with this email already exists."
 msgstr "Usuário com este email já existe."
 
-#: user/models.py:53
+#: user/models.py:64
 msgid "User with this cpf already exists."
 msgstr "Usuário com este cpf já existe."
 
-#: user/serializers.py:68
+#: user/serializers.py:97
 msgid "Unable to authenticate with provided credentials."
 msgstr "Não foi possível autenticar com as credenciais fornecidas."
 
-#: user/views.py:67 user/views.py:86 user/views.py:117
+#: user/views.py:123 user/views.py:142 user/views.py:173
 msgid "User not found."
 msgstr "Usuário não encontrado."
 
-#: user/views.py:95 user/views.py:129
+#: user/views.py:151 user/views.py:185
 msgid "Attempts exceeded."
 msgstr "Tentativas excedidas."
 
-#: user/views.py:98
+#: user/views.py:154
 msgid "Invalid Code."
 msgstr "Código inválido."
 
-#: user/views.py:120
+#: user/views.py:176
 msgid "Code does not exist."
 msgstr "O código não existe."
 
-#: user/views.py:139
+#: user/views.py:195
 #, fuzzy
 #| msgid "Invalid token."
 msgid "Invalid code."
@@ -87,3 +79,9 @@ msgstr "Código inválido."
 #: utils/email.py:15 utils/tests/test_email.py:30
 msgid "Your code to generate a new password!"
 msgstr "Seu código para gerar uma nova senha!"
+
+#~ msgid "Permissions"
+#~ msgstr "Permissões"
+
+#~ msgid "Important dates"
+#~ msgstr "Datas importantes"
