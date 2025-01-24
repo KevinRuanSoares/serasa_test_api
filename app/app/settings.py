@@ -68,8 +68,8 @@ INSTALLED_APPS = [
 ]
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Sales Growth AI API Project",
-    "DESCRIPTION": "API for Sales Growth AI Project",
+    "TITLE": "Brain Agriculture API Project",
+    "DESCRIPTION": "API for Brain Agriculture Project",
     "VERSION": PROJECT_VERSION,
 }
 
