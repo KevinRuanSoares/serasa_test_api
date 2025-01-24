@@ -204,3 +204,5 @@ AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
 AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "")
 AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_CLOUDFRONT_CUSTOM_DOMAIN", "")
 AWS_DEFAULT_ACL = None
+
+TEST_RUNNER = "django.test.runner.DiscoverRunner"
