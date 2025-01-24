@@ -1,6 +1,7 @@
 import re
 from django.core.exceptions import ValidationError
 
+
 def validate_cpf_cnpj(value):
     """
     Validate whether the provided value is a valid CPF or CNPJ.
@@ -15,6 +16,7 @@ def validate_cpf_cnpj(value):
             raise ValidationError("CNPJ inválido.")
     else:
         raise ValidationError("O valor informado não é um CPF ou CNPJ válido.")
+
 
 def validate_cpf(cpf):
     """
@@ -34,6 +36,7 @@ def validate_cpf(cpf):
     digit_2 = (sum_2 * 10 % 11) % 10
 
     return cpf[-2:] == f"{digit_1}{digit_2}"
+
 
 def validate_cnpj(cnpj):
     """

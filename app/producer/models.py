@@ -3,6 +3,7 @@ from utils.base_model import BaseModel
 from django.core.validators import MinValueValidator
 from utils.document_validator import validate_cpf_cnpj
 
+
 class Producer(BaseModel):
     cpf_cnpj = models.CharField(
         max_length=18, unique=True, validators=[validate_cpf_cnpj]
