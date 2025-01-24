@@ -34,7 +34,7 @@ remove-continers:
 	docker stop $(docker ps -aq) && docker rm $(docker ps -aq) && docker volume rm $(docker volume ls -q) && docker system prune -a
 
 proxy-terminal:
-	docker exec -ti serasa_test_api_proxy_1 sh
+	docker exec -ti serasa_test_api-proxy-1 sh
 
 app-terminal:
 	docker exec -ti serasa_test_api-app-1 sh
