@@ -44,7 +44,7 @@ RUN mkdir -p /vol/static && \
 
 # Install necessary packages
 RUN apk add --no-cache certbot py3-pip openssl && \
-    pip install certbot-nginx
+    pip install certbot-nginx --break-system-packages
 
 # Switch back to nginx user
 USER nginx
