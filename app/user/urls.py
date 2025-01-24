@@ -9,7 +9,8 @@ from user import views
 app_name = 'user'
 
 urlpatterns = [
-    path('create/', views.CreateUserView.as_view(), name='create'),
+    path('', views.UserManagementView.as_view(), name='list_create'),
+    path('<uuid:id>/', views.UserRetrieveUpdateView.as_view(), name='update_retrieve'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('login_refresh/', views.RefreshTokenView.as_view(), name='login_refresh'),
     path('profile/', views.ProfileUserView.as_view(), name='profile'),

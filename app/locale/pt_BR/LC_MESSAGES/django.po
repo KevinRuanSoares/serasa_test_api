@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-28 23:16+0000\n"
+"POT-Creation-Date: 2024-09-19 19:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr "Permissões"
 msgid "Important dates"
 msgstr "Datas importantes"
 
-#: user/auth/token.py:19 user/serializers.py:89
+#: user/auth/token.py:19 user/serializers.py:90
 msgid "Invalid token."
 msgstr "Token inválido."
 
@@ -38,15 +38,27 @@ msgstr "Usuário inativo ou excluído."
 msgid "The token has expired."
 msgstr "O token expirou."
 
-#: user/models.py:44
+#: user/choices.py:9
+msgid "Super Admin"
+msgstr "Super Admin"
+
+#: user/choices.py:10
+msgid "Admin"
+msgstr "Admin"
+
+#: user/choices.py:11
+msgid "Seller"
+msgstr "Vendedor"
+
+#: user/models.py:46
 msgid "User with this email already exists."
 msgstr "Usuário com este email já existe."
 
-#: user/models.py:51
+#: user/models.py:53
 msgid "User with this cpf already exists."
 msgstr "Usuário com este cpf já existe."
 
-#: user/serializers.py:67
+#: user/serializers.py:68
 msgid "Unable to authenticate with provided credentials."
 msgstr "Não foi possível autenticar com as credenciais fornecidas."
 

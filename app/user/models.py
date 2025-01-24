@@ -10,6 +10,7 @@ from django.contrib.auth.models import (
 )
 from django.utils.translation import gettext_lazy as _
 from utils import validate_cpf
+from user.choices import RULE_CHOICES, SUPER_ADMIN
 
 
 class UserManager(BaseUserManager):
@@ -30,9 +31,20 @@ class UserManager(BaseUserManager):
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
+        super_admin_role = Role.objects.get(name=SUPER_ADMIN)
+        user.roles.add(super_admin_role)
         user.save(using=self._db)
 
         return user
+
+
+class Role(models.Model):
+    """Role model representing a user role in the system."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=20, choices=RULE_CHOICES)
+
+    class Meta:
+        db_table = 'user_roles'
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -40,21 +52,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
 
     email = models.EmailField(max_length=255, unique=True, error_messages={
         'unique': _("User with this email already exists.")})
     name = models.CharField(max_length=255)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
 
     cpf = models.CharField(max_length=14, unique=True, validators=[
         validate_cpf
     ], error_messages={'unique': _("User with this cpf already exists.")})
-
-    street = models.CharField(max_length=255, null=True, blank=False)
-    postal_code = models.CharField(max_length=15, null=True, blank=False)
-    city = models.CharField(max_length=100, null=True, blank=False)
-    state = models.CharField(max_length=20, null=True, blank=False)
     phone_number = models.CharField(max_length=15, null=True, blank=False)
 
     recover_password_code = models.CharField(max_length=6, blank=True, null=True)
@@ -62,6 +69,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     recover_password_code_attempts = models.IntegerField(default=0)
     recover_password_attempts = models.IntegerField(default=0)
     profile_photo = models.FileField(upload_to='uploads/profile_photos/', null=True)
+
+    roles = models.ManyToManyField(Role)
 
     objects = UserManager()
 

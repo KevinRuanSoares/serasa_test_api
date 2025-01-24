@@ -1,0 +1,27 @@
+[
+    {
+      "model": "user.role",
+      "pk": "bdb80a3e-7458-4548-95f7-1b84c7b79cda",
+      "fields": {
+        "id": "bdb80a3e-7458-4548-95f7-1b84c7b79cda",
+        "name": "SUPER_ADMIN"
+      }
+    },
+    {
+      "model": "user.role",
+      "pk": "d20bb10d-2482-4372-93f4-3561a79d37f4",
+      "fields": {
+        "id": "d20bb10d-2482-4372-93f4-3561a79d37f4",
+        "name": "ADMIN"
+      }
+    },
+    {
+      "model": "user.role",
+      "pk": "68996e05-50dc-48c3-bca0-de3c4ce2f2a2",
+      "fields": {
+        "id": "68996e05-50dc-48c3-bca0-de3c4ce2f2a2",
+        "name": "SELLER"
+      }
+    }
+  ]
+  

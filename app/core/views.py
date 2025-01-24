@@ -12,5 +12,5 @@ def health_check(request):
     return Response({'healthy': True})
 
 
-def my_view(request):
-    return render(request, 'Layouts/email/password_reset_code.html')
+def home_view(request):
+    return render(request, 'Home/default.html')

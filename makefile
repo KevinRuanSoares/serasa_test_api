@@ -53,3 +53,6 @@ migrate:
 
 createsuperuser:
 	docker-compose run --rm app sh -c "python manage.py createsuperuser"
+
+loaddata:
+	docker-compose run --rm app sh -c "python manage.py loaddata user/fixtures/roles"

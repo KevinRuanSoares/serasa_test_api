@@ -8,15 +8,16 @@ from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
+from user.models import Role
 
-
-CREATE_USER_URL = reverse('user:create')
+CREATE_USER_URL = reverse('user:list_create')
 LOGIN_URL = reverse('user:login')
 REFRESH_URL = reverse('user:login_refresh')
 PROFILE_URL = reverse('user:profile')
 RECOVER_PASSWORD_CODE_URL = reverse('user:recover_password_code')
 VALIDATE_PASSWORD_CODE_URL = reverse('user:validate_password_code')
 CHANGE_PASSWORD_CODE_URL = reverse('user:change_password_code')
+LIST_USERS_URL = reverse('user:list_create')
 
 
 def create_user(**params):
@@ -24,19 +25,33 @@ def create_user(**params):
     return get_user_model().objects.create_user(**params)
 
 
-class PublicUserApiTests(TestCase):
+class BaseUserApiTests(TestCase):
     """Test the public features if the user API."""
+    fixtures = ['roles.json']
 
     def setUp(self):
+        role = Role.objects.get(pk='bdb80a3e-7458-4548-95f7-1b84c7b79cda')
+        self.super_admin_user = create_user(
+            email='admin@example.com',
+            password='testpass123',
+            name='Test Name',
+            cpf='224.144.330-19',
+            phone_number='(47) 99214-8301',
+            profile_photo=None,
+        )
+        self.super_admin_user.roles.add(role)
+        self.super_admin_user.save()
         self.client = APIClient()
 
     def test_create_user_success(self):
         """Test creating a user is successful."""
+        self.client.force_authenticate(user=self.super_admin_user)
         payload = {
             'email': 'test@example.com',
             'password': 'testpass123',
             'name': 'Test Name',
             'cpf': '433.982.130-65',
+            "role_names": ["ADMIN"]
         }
 
         res = self.client.post(CREATE_USER_URL, payload)
@@ -48,6 +63,7 @@ class PublicUserApiTests(TestCase):
 
     def test_user_with_email_exists_error(self):
         """Test error returned if user with email exists."""
+        self.client.force_authenticate(user=self.super_admin_user)
         payload = {
             'email': 'test@example.com',
             'password': 'testpass123',
@@ -61,6 +77,7 @@ class PublicUserApiTests(TestCase):
 
     def test_password_too_short_error(self):
         """Test an error is returned if password less than 5 chars."""
+        self.client.force_authenticate(user=self.super_admin_user)
         payload = {
             'email': 'test@example.com',
             'password': 'pw',
@@ -76,6 +93,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_token_for_user(self):
         """Test generates token for valid credentials."""
+        self.client.force_authenticate(user=self.super_admin_user)
         user_details = {
             'name': 'Test Name',
             'email': 'test@example.com',
@@ -91,18 +109,18 @@ class PublicUserApiTests(TestCase):
         res = self.client.post(LOGIN_URL, payload)
 
         self.assertIn('token', res.data)
+        self.assertEqual(res.data['email'], user_details['email'])
+        self.assertEqual(res.data['name'], user_details['name'])
+        self.assertEqual(len(res.data['roles']), 0)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_create_token_bad_credentials(self):
         """Test returns error if credentials invalid."""
+        self.client.force_authenticate(user=self.super_admin_user)
         create_user(
             email='test@example.com',
             password='goodpass',
             cpf='385.699.040-29',
-            street='Rua Ernesto Lazzaron',
-            postal_code='97070-415',
-            city='Santa Maria',
-            state='RS',
             phone_number='(47) 99214-8301',
         )
 
@@ -114,6 +132,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_token_email_not_found(self):
         """Test error returned if user not found for given email."""
+        self.client.force_authenticate(user=self.super_admin_user)
         payload = {'email': 'test@example.com', 'password': 'pass123'}
         res = self.client.post(LOGIN_URL, payload)
 
@@ -122,6 +141,7 @@ class PublicUserApiTests(TestCase):
 
     def test_create_token_blank_password(self):
         """Test posting a blank password returns an error."""
+        self.client.force_authenticate(user=self.super_admin_user)
         payload = {'email': 'test@example.com', 'password': ''}
         res = self.client.post(LOGIN_URL, payload)
 
@@ -144,10 +164,6 @@ class PrivateUserApiTests(TestCase):
             password='testpass123',
             name='Test Name',
             cpf='433.982.130-65',
-            street='Rua Ernesto Lazzaron',
-            postal_code='97070-415',
-            city='Santa Maria',
-            state='RS',
             phone_number='(47) 99214-8301',
             profile_photo=None,
         )
@@ -163,10 +179,6 @@ class PrivateUserApiTests(TestCase):
             'name': self.user.name,
             'email': self.user.email,
             'cpf': self.user.cpf,
-            'street': self.user.street,
-            'postal_code': self.user.postal_code,
-            'city': self.user.city,
-            'state': self.user.state,
             'phone_number': self.user.phone_number,
             'profile_photo': None,
         })
@@ -333,3 +345,152 @@ class ChangePasswordCodeViewTests(TestCase):
         self.assertTrue(self.user.check_password('newpassword'))
         self.assertIsNone(self.user.recover_password_code)
         self.assertEqual(self.user.recover_password_attempts, 0)
+
+
+class ListUsersApiTests(TestCase):
+    """Test listing users with filtering, pagination, and ordering."""
+    fixtures = ['roles.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        role = Role.objects.get(pk='bdb80a3e-7458-4548-95f7-1b84c7b79cda')  # Exemplo de role de super admin
+        self.super_admin_user = create_user(
+            email='admin@example.com',
+            password='testpass123',
+            name='Admin User',
+            cpf='111.111.111-11',
+        )
+        self.super_admin_user.roles.add(role)
+        self.super_admin_user.save()
+
+        # Criação de múltiplos usuários para o teste de paginação e filtros
+        self.user1 = create_user(
+            email='user1@example.com',
+            password='testpass123',
+            name='Test User One',
+            cpf='222.222.222-22',
+        )
+        self.user2 = create_user(
+            email='user2@example.com',
+            password='testpass123',
+            name='Test User Two',
+            cpf='333.333.333-33',
+        )
+        self.user3 = create_user(
+            email='user3@example.com',
+            password='testpass123',
+            name='Test User Three',
+            cpf='444.444.444-44',
+        )
+
+        self.client.force_authenticate(user=self.super_admin_user)
+
+    def test_list_users_with_pagination(self):
+        """Test listing users with pagination."""
+        res = self.client.get(LIST_USERS_URL, {'page': 1, 'page_size': 2})
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data['results']), 2)  # Verifica se 2 usuários estão sendo retornados
+        self.assertIn('Test User One', [user['name'] for user in res.data['results']])
+
+    def test_list_users_with_filter(self):
+        """Test filtering users by name."""
+        res = self.client.get(LIST_USERS_URL, {'name': 'Test User Two'})
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data['results']), 1)
+        self.assertEqual(res.data['results'][0]['name'], 'Test User Two')
+
+    def test_list_users_with_ordering(self):
+        """Test listing users with ordering by name."""
+        res = self.client.get(LIST_USERS_URL, {'ordering': 'name'})
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        names = [user['name'] for user in res.data['results']]
+        self.assertEqual(names, ['Test User One', 'Test User Three', 'Test User Two'])
+
+    def test_list_users_unauthorized(self):
+        """Test that listing users requires authentication."""
+        self.client.force_authenticate(user=None)  # Remove autenticação
+        res = self.client.get(LIST_USERS_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class UserRetrieveUpdateViewTests(TestCase):
+    """Test cases for UserRetrieveUpdateView."""
+    fixtures = ['roles.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        role_admin = Role.objects.get(pk='bdb80a3e-7458-4548-95f7-1b84c7b79cda')
+        self.super_admin_user = create_user(
+            email='admin@example.com',
+            password='testpass123',
+            name='Super Admin',
+            cpf='111.111.111-11',
+        )
+        self.admin_user = create_user(
+            email='admin_user@example.com',
+            password='adminpass123',
+            name='Admin User',
+            cpf='222.222.222-22',
+        )
+        self.admin_user.roles.add(role_admin)
+        self.admin_user.save()
+
+        self.user = create_user(
+            email='user@example.com',
+            password='userpass123',
+            name='Test User',
+            cpf='333.333.333-33',
+        )
+
+        self.client.force_authenticate(user=self.admin_user)
+
+    def test_retrieve_user_profile(self):
+        """Test retrieving a user profile."""
+        url = reverse('user:update_retrieve', kwargs={'id': self.user.id})
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['email'], self.user.email)
+
+    def test_update_user_profile(self):
+        """Test updating a user profile."""
+        url = reverse('user:update_retrieve', kwargs={'id': self.user.id})
+        payload = {'name': 'Updated Name'}
+
+        res = self.client.patch(url, payload)
+        self.user.refresh_from_db()
+
+        self.assertEqual(self.user.name, payload['name'])
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_update_user_password(self):
+        """Test updating a user's password."""
+        url = reverse('user:update_retrieve', kwargs={'id': self.user.id})
+        payload = {'password': 'newpassword123'}
+
+        res = self.client.patch(url, payload)
+        self.user.refresh_from_db()
+
+        self.assertTrue(self.user.check_password(payload['password']))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_delete_user(self):
+        """Test soft deleting a user."""
+        url = reverse('user:update_retrieve', kwargs={'id': self.user.id})
+
+        res = self.client.delete(url)
+        self.user.refresh_from_db()
+
+        self.assertTrue(self.user.is_deleted)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_retrieve_user_not_found(self):
+        """Test retrieving a user that does not exist returns 404."""
+        url = reverse('user:update_retrieve', kwargs={'id': '5ec9d156-643f-48bd-b900-80e51bef7b77'})
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)

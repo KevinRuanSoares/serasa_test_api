@@ -3,17 +3,20 @@ Views for the user API.
 """
 
 import threading
+from django.utils import timezone
 from random import randint
 from django.contrib.auth import (
     get_user_model,
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
 from rest_framework.settings import api_settings
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from django_filters.rest_framework import DjangoFilterBackend
 
 from user.serializers import (
     UserSerializer,
@@ -27,18 +30,71 @@ from user.serializers import (
 from user.auth import (
     CheckTokenAuthentication,
 )
+from user.permissions import IsSuperAdmin, IsAdmin
+from user.filters import UserFilter
 from utils.email import send_password_reset_code
+from utils.pagination import CustomPagination
 
 
-class CreateUserView(generics.CreateAPIView):
-    """Create a new user in the system."""
+class UserManagementView(generics.ListCreateAPIView):
+    """Manage users in the system. Allows listing, creating, and updating users."""
     serializer_class = UserSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_class = UserFilter
+    ordering_fields = ['name', 'email', 'cpf']
+    ordering = ['name']
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        """Return the queryset excluding the logged-in user."""
+        return get_user_model().objects.exclude(
+            roles__name='SUPER_ADMIN'
+        ).exclude(
+            is_deleted=True
+        ).exclude(
+            id=self.request.user.id
+        )
+
+
+class UserRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    """Manage retrieving and updating users in the system."""
+    serializer_class = UserSerializer
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+    queryset = get_user_model().objects.exclude(roles__name='SUPER_ADMIN').exclude(is_deleted=True)
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
 
 
 class LoginView(ObtainAuthToken):
-    """Create a new auth token for user."""
+    """Create a new auth token for user and return user roles."""
     serializer_class = AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, _ = Token.objects.get_or_create(user=user)
+        roles = user.roles.all().values_list('name', flat=True)
+        token.created = timezone.now()
+        token.save()
+        return Response({
+            'token': token.key,
+            'email': user.email,
+            'name': user.name,
+            'profile_photo': user.profile_photo.url if user.profile_photo else None,
+            'roles': list(roles)
+        })
 
 
 class RefreshTokenView(generics.CreateAPIView):
