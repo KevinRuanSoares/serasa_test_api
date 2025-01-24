@@ -1,6 +1,6 @@
 server {
     listen ${LISTEN_PORT};
-    server_name brain_agriculture.kevinsoares.com.br;
+    server_name brain.agriculture.kevinsoares.com.br;
 
     location /static {
         alias /vol/static;
@@ -17,4 +17,3 @@ server {
         client_max_body_size    20M;
     }
 }
-
