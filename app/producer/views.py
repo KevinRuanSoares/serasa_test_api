@@ -161,6 +161,9 @@ class PlantedCropRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class DashboardView(APIView):
+    authentication_classes = [CheckTokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated, (IsAdmin | IsSuperAdmin)]
+
     def get(self, request, *args, **kwargs):
         farms_by_state = (
             Farm.objects.filter(is_deleted=False)
