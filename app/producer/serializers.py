@@ -79,8 +79,8 @@ class HarvestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Harvest
-        fields = ['id', 'year', 'farm', 'created_at', 'updated_at']
-        read_only_fields = ('id', 'created_at', 'updated_at')
+        fields = ['id', 'year', 'farm', 'farm_name', 'created_at', 'updated_at']
+        read_only_fields = ('id', 'created_at', 'farm_name', 'updated_at')
 
 
 class PlantedCropSerializer(serializers.ModelSerializer):

@@ -67,6 +67,10 @@ class Harvest(BaseModel):
     def __str__(self):
         return f"{self.year} - {self.farm.name}"
 
+    @property
+    def farm_name(self):
+        return self.farm.name
+
 
 class PlantedCrop(BaseModel):
     harvest = models.ForeignKey(
