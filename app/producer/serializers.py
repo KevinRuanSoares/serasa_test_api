@@ -39,10 +39,11 @@ class FarmSerializer(serializers.ModelSerializer):
             'arable_area',
             'vegetation_area',
             'producer',
+            'producer_name',
             'created_at',
             'updated_at'
         ]
-        read_only_fields = ('id', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'producer_name', 'created_at', 'updated_at')
 
     def validate(self, data):
         # Verifica se as áreas estão presentes no payload

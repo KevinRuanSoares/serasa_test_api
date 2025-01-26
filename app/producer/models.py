@@ -40,6 +40,10 @@ class Farm(BaseModel):
     def __str__(self):
         return self.name
 
+    @property
+    def producer_name(self):
+        return self.producer.name
+
 
 class Crop(BaseModel):
     name = models.CharField(max_length=255)
