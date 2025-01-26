@@ -23,4 +23,5 @@ urlpatterns = [
         views.PlantedCropRetrieveUpdateView.as_view(),
         name='update_retrieve_planted_crop'
     ),
+    path('dashboard/', views.DashboardView.as_view(), name='dashboard-data'),
 ]

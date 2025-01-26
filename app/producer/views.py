@@ -3,6 +3,9 @@ from user.auth import (
     CheckTokenAuthentication,
 )
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Count, Sum
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from producer.serializers import (
     ProducerSerializer,
     FarmSerializer,
@@ -155,3 +158,33 @@ class PlantedCropRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance):
         instance.is_deleted = True
         instance.save()
+
+
+class DashboardView(APIView):
+    def get(self, request, *args, **kwargs):
+        farms_by_state = (
+            Farm.objects.filter(is_deleted=False)
+            .values('state')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+        farm_state_data = [{'state': item['state'], 'count': item['count']} for item in farms_by_state]
+        crops_distribution = (
+            PlantedCrop.objects.filter(is_deleted=False)
+            .values('crop__name')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+        )
+        crop_data = [{'crop': item['crop__name'], 'count': item['count']} for item in crops_distribution]
+        land_use = Farm.objects.filter(is_deleted=False).aggregate(
+            total_area=Sum('total_area'),
+            arable_area=Sum('arable_area'),
+            vegetation_area=Sum('vegetation_area')
+        )
+        data = {
+            'farms_by_state': farm_state_data,
+            'crops_distribution': crop_data,
+            'land_use': land_use
+        }
+
+        return Response(data)
