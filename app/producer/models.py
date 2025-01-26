@@ -6,7 +6,7 @@ from utils.document_validator import validate_cpf_cnpj
 
 class Producer(BaseModel):
     cpf_cnpj = models.CharField(
-        max_length=18, unique=True, validators=[validate_cpf_cnpj]
+        max_length=18, validators=[validate_cpf_cnpj]
     )
     name = models.CharField(max_length=255)
 
