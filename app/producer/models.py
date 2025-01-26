@@ -85,3 +85,15 @@ class PlantedCrop(BaseModel):
 
     def __str__(self):
         return f"{self.crop.name} ({self.harvest.year})"
+
+    @property
+    def crop_name(self):
+        return self.crop.name
+
+    @property
+    def harvest_year(self):
+        return self.harvest.year
+
+    @property
+    def farm_name(self):
+        return self.harvest.farm.name
