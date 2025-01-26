@@ -1,17 +1,37 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APIClient
-from producer.models import Farm, Producer, PlantedCrop, Crop
+from user.models import Role
+from producer.models import Farm, Producer, PlantedCrop, Crop, Harvest
 
 DASHBOARD_URL = reverse('producer:dashboard-data')
+
+
+def create_user(**params):
+    """Create and return a new user."""
+    return get_user_model().objects.create_user(**params)
 
 
 class DashboardApiTests(TestCase):
     """Test the dashboard data API."""
 
+    fixtures = ['roles.json']
+
     def setUp(self):
+        role_admin = Role.objects.get(pk='bdb80a3e-7458-4548-95f7-1b84c7b79cda')
+        self.admin_user = create_user(
+            email='admin@example.com',
+            password='testpass123',
+            name='Admin User',
+            cpf='111.111.111-11',
+        )
+        self.admin_user.roles.add(role_admin)
+        self.admin_user.save()
+
         self.client = APIClient()
+        self.client.force_authenticate(user=self.admin_user)
 
         # Create a producer
         self.producer = Producer.objects.create(
@@ -44,13 +64,19 @@ class DashboardApiTests(TestCase):
             is_deleted=True
         )
 
+        # Create a harvest
+        self.harvest = Harvest.objects.create(
+            year='2023',
+            farm=self.farm_1
+        )
+
         # Create planted crops
         self.planted_crop_1 = PlantedCrop.objects.create(
-            harvest_id=1,  # Simulated Harvest ID
+            harvest=self.harvest,
             crop=self.crop_soja
         )
         self.planted_crop_2 = PlantedCrop.objects.create(
-            harvest_id=1,
+            harvest=self.harvest,
             crop=self.crop_milho,
             is_deleted=True
         )
